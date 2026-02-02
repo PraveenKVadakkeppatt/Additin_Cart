@@ -1,3 +1,13 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16-alpine
+    env_file:
+      - ./backend-drf/.env.production
+    volumes:
+      - postgres_data:version: "3.9"
+
 services:
   db:
     image: postgres:16-alpine
@@ -5,40 +15,44 @@ services:
       - ./backend-drf/.env.production
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    restart: always
 
   backend:
     build: ./backend-drf
-    ports:
-      - "8000:8000"
+    command: >
+      sh -c "
+      python manage.py migrate &&
+      python manage.py collectstatic --noinput &&
+      gunicorn clickmart_main.wsgi:application --bind 0.0.0.0:8000
+      "
     env_file:
-      - ./backend-drf/.env.docker
+      - ./backend-drf/.env.production
+    expose:
+      - "8000"
+    volumes:
+      - ./backend-drf/staticfiles:/static
+      - ./backend-drf/media:/media
     depends_on:
       - db
-    volumes:
-      - ./backend-drf/static:/app/static
-      - ./backend-drf/media:/app/media
-    command: >
-      sh -c "python manage.py collectstatic --noinput &&
-             python manage.py migrate &&
-             python manage.py runserver 0.0.0.0:8000"
+    restart: always
 
   frontend:
-    build:
-      context: ./frontend
-      args:
-        VITE_SERVER_BASE_URL: "http://backend:8000/api/v1"
+    build: ./frontend
+    restart: always
+
+  nginx:
+    image: nginx:latest
     ports:
-      - "5173:80"
+      - "80:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./backend-drf/staticfiles:/static
+      - ./backend-drf/media:/media
     depends_on:
       - backend
+      - frontend
+    restart: always
 
-
-# This creates a named Docker volume to permanently store PostgreSQL data.
-# Without this:
-  # Database data is stored inside the container
-  # If container is deleted → data is lost
-# With this:
-  # Data is stored in a Docker-managed volume
-  # Data persists even if container stops or restarts
 volumes:
   postgres_data:
+

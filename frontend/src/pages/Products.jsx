@@ -11,7 +11,7 @@ const Products = () => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        const response = await api.get("/product/");
+        const response = await api.get("/products/");
         setProducts(response.data);
         setError(null);
       } catch (err) {

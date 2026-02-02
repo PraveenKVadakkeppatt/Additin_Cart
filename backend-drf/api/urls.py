@@ -15,8 +15,8 @@ urlpatterns = [
 
     path ('profile/',UserViews.ProfileView.as_view()),
 
-    path('product/',ProductViews.ProductListView.as_view()),
-    path('product/<int:pk>/',ProductViews.ProductDetailsView.as_view()),
+    path('products/',ProductViews.ProductListView.as_view()),
+    path('products/<int:pk>/',ProductViews.ProductDetailsView.as_view()),
 
     path('cart/',CartViews.CartList.as_view()),
     path('cart/add/',CartViews.AddToCartView.as_view()),

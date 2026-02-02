@@ -27,7 +27,27 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = []
+CSRF_TRUSTED_ORIGINS = [
+    "http://98.86.118.49",
+    "http://localhost",
+]
+
+ALLOWED_HOSTS = [
+    "98.86.118.49",
+    "localhost",
+    "127.0.0.1",
+]
+
+
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'http')
+SECURE_SSL_REDIRECT = False
+
+CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = False
+
+CSRF_COOKIE_SAMESITE = "Lax"
+SESSION_COOKIE_SAMESITE = "Lax"
 
 
 # Application definition
@@ -137,11 +157,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR/'static'
-STATICFILES_DIRS = [
-    'clickmart_main/static'
-]
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR/'staticfiles'
+
 
 
 MEDIA_URL = "/media/"
@@ -153,7 +171,6 @@ MEDIA_ROOT = BASE_DIR / "media"
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = "users.User"
-
 
 REST_FRAMEWORK = {
     
